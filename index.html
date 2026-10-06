@@ -1,0 +1,2631 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AcuNav Smart Home AMR</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+:root{
+    --bg:#070914;
+    --panel:#101426;
+    --panel2:#151b31;
+    --line:#293252;
+    --cyan:#22d3ee;
+    --blue:#6366f1;
+    --purple:#a855f7;
+    --green:#34d399;
+    --yellow:#fbbf24;
+    --red:#fb7185;
+    --text:#f8fafc;
+    --muted:#8993ad;
+}
+
+body{
+    font-family:Arial,sans-serif;
+    background:
+        radial-gradient(circle at 20% 10%,rgba(99,102,241,.16),transparent 30%),
+        radial-gradient(circle at 80% 80%,rgba(34,211,238,.10),transparent 30%),
+        var(--bg);
+    color:var(--text);
+    height:100vh;
+    overflow:hidden;
+}
+
+/* HEADER */
+
+.header{
+    height:68px;
+    display:flex;
+    align-items:center;
+    padding:0 18px;
+    background:rgba(16,20,38,.88);
+    border-bottom:1px solid var(--line);
+    backdrop-filter:blur(15px);
+}
+
+.logo{
+    width:44px;
+    height:44px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:13px;
+    margin-right:12px;
+    background:linear-gradient(135deg,var(--cyan),var(--purple));
+    box-shadow:0 0 25px rgba(34,211,238,.3);
+    font-size:23px;
+    font-weight:bold;
+}
+
+.header h1{
+    font-size:18px;
+}
+
+.header p{
+    margin-top:4px;
+    font-size:9px;
+    color:var(--muted);
+    letter-spacing:1px;
+}
+
+.header-right{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.status{
+    padding:7px 11px;
+    border:1px solid rgba(52,211,153,.3);
+    border-radius:20px;
+    color:var(--green);
+    background:rgba(52,211,153,.08);
+    font-size:10px;
+    font-weight:bold;
+}
+
+.robot-id{
+    padding:8px 11px;
+    background:#171c30;
+    border:1px solid var(--line);
+    border-radius:7px;
+    font-family:monospace;
+    font-size:10px;
+}
+
+/* MAIN */
+
+.main{
+    height:calc(100vh - 68px);
+    padding:10px;
+    display:grid;
+    grid-template-columns:245px 1fr 285px;
+    grid-template-rows:1fr 74px;
+    gap:10px;
+}
+
+/* SIDEBARS */
+
+.sidebar{
+    min-width:0;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.card{
+    background:rgba(16,20,38,.86);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:13px;
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+    backdrop-filter:blur(12px);
+}
+
+.card h2{
+    font-size:10px;
+    color:#b5bed3;
+    text-transform:uppercase;
+    letter-spacing:1px;
+    padding-bottom:9px;
+    margin-bottom:10px;
+    border-bottom:1px solid var(--line);
+}
+
+/* BATTERY */
+
+.battery-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.battery-value{
+    font-size:22px;
+    font-weight:bold;
+    color:var(--green);
+}
+
+.battery-icon{
+    border:2px solid var(--green);
+    width:38px;
+    height:18px;
+    border-radius:4px;
+    position:relative;
+}
+
+.battery-icon:after{
+    content:"";
+    position:absolute;
+    right:-5px;
+    top:4px;
+    width:3px;
+    height:7px;
+    background:var(--green);
+}
+
+.battery-fill{
+    width:82%;
+    height:100%;
+    background:var(--green);
+    border-radius:2px;
+}
+
+/* TELEMETRY */
+
+.telemetry{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+}
+
+.telemetry div{
+    background:#171c30;
+    border:1px solid #252d4a;
+    border-radius:7px;
+    padding:8px;
+}
+
+.telemetry small{
+    display:block;
+    color:#707b98;
+    font-size:8px;
+}
+
+.telemetry strong{
+    display:block;
+    margin-top:4px;
+    font-family:monospace;
+    font-size:11px;
+}
+
+/* ROOM BUTTONS */
+
+.room-btn{
+    width:100%;
+    padding:9px;
+    margin-bottom:6px;
+    border:1px solid #293252;
+    background:#151a2d;
+    color:white;
+    border-radius:7px;
+    cursor:pointer;
+    text-align:left;
+    font-size:10px;
+    transition:.2s;
+}
+
+.room-btn:hover{
+    border-color:var(--cyan);
+    transform:translateX(2px);
+}
+
+.room-btn span{
+    float:right;
+    color:var(--cyan);
+}
+
+/* MODES */
+
+.mode{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px;
+}
+
+.mode button{
+    padding:9px 5px;
+    background:#151a2d;
+    color:#dbe4f5;
+    border:1px solid #293252;
+    border-radius:7px;
+    cursor:pointer;
+    font-size:9px;
+}
+
+.mode button:hover,
+.mode button.active{
+    background:linear-gradient(135deg,#4338ca,#0891b2);
+    border-color:transparent;
+    color:white;
+}
+
+/* SELECT */
+
+select{
+    width:100%;
+    padding:9px;
+    background:#151a2d;
+    color:white;
+    border:1px solid var(--line);
+    border-radius:7px;
+    outline:none;
+}
+
+/* MAP */
+
+.map-section{
+    min-width:0;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    background:#0d1222;
+    border:1px solid var(--line);
+    border-radius:12px;
+    overflow:hidden;
+}
+
+.toolbar{
+    min-height:48px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:7px;
+    background:#141a2d;
+    border-bottom:1px solid var(--line);
+}
+
+.toolbar button{
+    padding:8px 10px;
+    border:1px solid #303956;
+    background:#0f1426;
+    color:#dce4f4;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:9px;
+    font-weight:bold;
+}
+
+.toolbar button:hover{
+    border-color:var(--cyan);
+}
+
+.toolbar button.active{
+    background:linear-gradient(135deg,#6366f1,#0891b2);
+    border-color:transparent;
+}
+
+/* CANVAS */
+
+.canvas-container{
+    position:relative;
+    flex:1;
+    min-height:0;
+    background:#080c18;
+}
+
+#mapCanvas{
+    width:100%;
+    height:100%;
+    display:block;
+}
+
+/* MAP LABEL */
+
+.map-title{
+    position:absolute;
+    left:14px;
+    top:12px;
+    padding:8px 12px;
+    background:rgba(8,12,24,.85);
+    border:1px solid #293252;
+    border-radius:8px;
+    font-size:10px;
+    color:#b9c3d8;
+    pointer-events:none;
+}
+
+.legend{
+    position:absolute;
+    bottom:10px;
+    left:10px;
+    display:flex;
+    gap:10px;
+    padding:8px 10px;
+    background:rgba(7,9,20,.9);
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:8px;
+}
+
+.legend span{
+    display:flex;
+    align-items:center;
+    gap:4px;
+}
+
+.dot{
+    width:9px;
+    height:9px;
+    border-radius:2px;
+}
+
+.l-wall{background:#ef476f}
+.l-furniture{background:#64748b}
+.l-rug{background:#8b5cf6}
+.l-route{background:#22d3ee}
+.l-robot{background:#fbbf24}
+
+/* RIGHT CONTROLS */
+
+.dpad{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:5px;
+}
+
+.dpad-row{
+    display:flex;
+    gap:5px;
+}
+
+.dpad button{
+    width:40px;
+    height:38px;
+    border-radius:7px;
+    border:1px solid #303956;
+    background:#171d33;
+    color:white;
+    cursor:pointer;
+    font-size:16px;
+}
+
+.dpad button:hover{
+    background:#4338ca;
+}
+
+.stop{
+    background:#be123c !important;
+}
+
+/* SLIDER */
+
+.slider-row{
+    display:flex;
+    justify-content:space-between;
+    color:#9ca7bf;
+    font-size:9px;
+    margin-top:10px;
+}
+
+input[type=range]{
+    width:100%;
+    accent-color:var(--cyan);
+}
+
+/* QUEUE */
+
+.queue{
+    min-height:70px;
+    max-height:120px;
+    overflow:auto;
+}
+
+.queue-item{
+    display:flex;
+    justify-content:space-between;
+    padding:7px;
+    margin-bottom:5px;
+    border-radius:6px;
+    background:#171c30;
+    font-size:9px;
+}
+
+.queue-item button{
+    border:none;
+    background:none;
+    color:var(--red);
+    cursor:pointer;
+}
+
+/* FOOTER */
+
+.footer{
+    grid-column:1/-1;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:9px 12px;
+    background:rgba(16,20,38,.9);
+    border:1px solid var(--line);
+    border-radius:10px;
+}
+
+.footer-stats{
+    display:flex;
+    gap:7px;
+}
+
+.footer-stat{
+    padding:7px 10px;
+    background:#171c30;
+    border:1px solid #293252;
+    border-radius:6px;
+    font-size:9px;
+    color:#9aa5bd;
+}
+
+.footer-stat b{
+    color:var(--cyan);
+    margin-left:4px;
+}
+
+.actions{
+    display:flex;
+    gap:7px;
+}
+
+.actions button{
+    padding:10px 14px;
+    border:none;
+    border-radius:7px;
+    color:white;
+    font-size:9px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.start{
+    background:linear-gradient(135deg,#4f46e5,#0891b2);
+}
+
+.stop-btn{
+    background:#e11d48;
+}
+
+/* ALERT */
+
+.alert{
+    position:fixed;
+    z-index:999;
+    top:80px;
+    left:50%;
+    transform:translateX(-50%);
+    padding:10px 18px;
+    background:#151a2d;
+    border:1px solid var(--cyan);
+    color:white;
+    border-radius:20px;
+    box-shadow:0 0 25px rgba(34,211,238,.25);
+    font-size:10px;
+    font-weight:bold;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1100px){
+    .main{
+        grid-template-columns:210px 1fr 230px;
+    }
+}
+
+@media(max-width:800px){
+    body{
+        overflow:auto;
+    }
+
+    .main{
+        height:auto;
+        grid-template-columns:1fr;
+        grid-template-rows:auto 600px auto auto;
+    }
+
+    .footer{
+        grid-column:auto;
+        flex-direction:column;
+        gap:10px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+
+<header class="header">
+
+    <div class="logo">A</div>
+
+    <div>
+        <h1>AcuNav Smart Home AMR</h1>
+        <p>AUTONOMOUS HOUSEHOLD ROBOT • AI NAVIGATION CONSOLE</p>
+    </div>
+
+    <div class="header-right">
+        <div class="status">● SYSTEM ONLINE</div>
+        <div class="robot-id">AMR-01 • ROS2</div>
+    </div>
+
+</header>
+
+
+<main class="main">
+
+
+<!-- LEFT SIDEBAR -->
+
+<aside class="sidebar">
+
+    <div class="card">
+
+        <h2>🤖 Robot Health</h2>
+
+        <div class="battery-top">
+
+            <div>
+                <small style="color:#7d879e">BATTERY</small>
+                <div class="battery-value" id="batteryText">82%</div>
+            </div>
+
+            <div class="battery-icon">
+                <div class="battery-fill" id="batteryFill"></div>
+            </div>
+
+        </div>
+
+        <div style="margin-top:12px;color:#7f8aa4;font-size:9px;">
+            Estimated runtime
+            <b style="float:right;color:white;">2h 18m</b>
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>📡 Live Telemetry</h2>
+
+        <div class="telemetry">
+
+            <div>
+                <small>VELOCITY</small>
+                <strong id="velocity">0.00 m/s</strong>
+            </div>
+
+            <div>
+                <small>HEADING</small>
+                <strong id="heading">0°</strong>
+            </div>
+
+            <div>
+                <small>POS X</small>
+                <strong id="posX">2.5 m</strong>
+            </div>
+
+            <div>
+                <small>POS Y</small>
+                <strong id="posY">2.5 m</strong>
+            </div>
+
+            <div>
+                <small>LIDAR</small>
+                <strong style="color:#34d399">READY</strong>
+            </div>
+
+            <div>
+                <small>LOCALIZATION</small>
+                <strong style="color:#34d399">98.7%</strong>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>🧠 Navigation Mode</h2>
+
+        <div class="mode">
+
+            <button class="active" onclick="setMode(this,'Smart A*')">
+                🧠 Smart A*
+            </button>
+
+            <button onclick="setMode(this,'Room Patrol')">
+                🔄 Patrol
+            </button>
+
+            <button onclick="setMode(this,'Spot Clean')">
+                ✨ Spot Clean
+            </button>
+
+            <button onclick="setMode(this,'Wet Mop')">
+                💧 Wet Mop
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>🏠 House Zones</h2>
+
+        <button class="room-btn" onclick="goRoom(10,7,'Living Room')">
+            🛋️ Living Room
+            <span>GO</span>
+        </button>
+
+        <button class="room-btn" onclick="goRoom(26,6,'Kitchen')">
+            🍳 Kitchen
+            <span>GO</span>
+        </button>
+
+        <button class="room-btn" onclick="goRoom(44,7,'Dining Room')">
+            🍽️ Dining Room
+            <span>GO</span>
+        </button>
+
+        <button class="room-btn" onclick="goRoom(12,27,'Master Bedroom')">
+            🛏️ Master Bedroom
+            <span>GO</span>
+        </button>
+
+        <button class="room-btn" onclick="goRoom(35,27,'Study')">
+            💻 Smart Study
+            <span>GO</span>
+        </button>
+
+        <button class="room-btn" onclick="goRoom(52,27,'Utility')">
+            🧺 Utility Room
+            <span>GO</span>
+        </button>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>⚙️ Cleaning Profile</h2>
+
+        <select onchange="setProfile(this.value)">
+            <option value="Eco">🌿 Eco • Quiet</option>
+            <option value="Normal">⚡ Normal • Balanced</option>
+            <option value="Turbo">🚀 Turbo • Maximum</option>
+        </select>
+
+        <div class="slider-row">
+            <span>MAX SPEED</span>
+            <b id="speedText">0.6 m/s</b>
+        </div>
+
+        <input
+            type="range"
+            min="0.2"
+            max="2"
+            step="0.1"
+            value="0.6"
+            oninput="changeSpeed(this.value)"
+        >
+
+    </div>
+
+</aside>
+
+
+<!-- MAP -->
+
+<section class="map-section">
+
+    <div class="toolbar">
+
+        <button class="active" onclick="setTool('goal')">
+            🚩 Set Destination
+        </button>
+
+        <button onclick="setTool('furniture')">
+            🛋 Furniture
+        </button>
+
+        <button onclick="setTool('wall')">
+            🧱 Wall
+        </button>
+
+        <button onclick="setTool('rug')">
+            🟣 Rug
+        </button>
+
+        <button onclick="setTool('erase')">
+            🧹 Erase
+        </button>
+
+        <button onclick="resetMap()">
+            ↻ Reset House
+        </button>
+
+    </div>
+
+
+    <div class="canvas-container">
+
+        <canvas id="mapCanvas"></canvas>
+
+        <div class="map-title">
+            🏡 SMART VILLA • FLOOR 01 • A* NAVIGATION GRID
+        </div>
+
+        <div class="legend">
+
+            <span>
+                <i class="dot l-wall"></i> Wall
+            </span>
+
+            <span>
+                <i class="dot l-furniture"></i> Furniture
+            </span>
+
+            <span>
+                <i class="dot l-rug"></i> Rug
+            </span>
+
+            <span>
+                <i class="dot l-route"></i> A* Route
+            </span>
+
+            <span>
+                <i class="dot l-robot"></i> AMR
+            </span>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- RIGHT SIDEBAR -->
+
+<aside class="sidebar">
+
+
+    <div class="card">
+
+        <h2>🎯 Mission Control</h2>
+
+        <div style="
+            padding:10px;
+            background:#171c30;
+            border-radius:7px;
+            border:1px solid #293252;
+        ">
+
+            <div style="font-size:9px;color:#7e89a3;">
+                CURRENT DESTINATION
+            </div>
+
+            <strong id="destination"
+                    style="display:block;margin-top:5px;">
+                Utility Room
+            </strong>
+
+            <div style="
+                margin-top:9px;
+                height:5px;
+                background:#252d45;
+                border-radius:5px;
+            ">
+
+                <div id="progress"
+                     style="
+                     width:0%;
+                     height:100%;
+                     background:linear-gradient(90deg,#6366f1,#22d3ee);
+                     border-radius:5px;">
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>⭐ Smart Presets</h2>
+
+        <button class="room-btn" onclick="goRoom(10,7,'Sofa')">
+            🛋️ Living Sofa
+            <span>→</span>
+        </button>
+
+        <button class="room-btn" onclick="goRoom(26,7,'Kitchen Island')">
+            🍳 Kitchen Island
+            <span>→</span>
+        </button>
+
+        <button class="room-btn" onclick="goRoom(44,7,'Dining Table')">
+            🍽️ Dining Table
+            <span>→</span>
+        </button>
+
+        <button class="room-btn" onclick="goRoom(12,27,'Master Bed')">
+            🛏️ Master Bed
+            <span>→</span>
+        </button>
+
+        <button class="room-btn" onclick="goRoom(35,27,'Study Desk')">
+            💻 Study Desk
+            <span>→</span>
+        </button>
+
+        <button class="room-btn" onclick="goRoom(52,27,'Charging Dock')">
+            ⚡ Charging Dock
+            <span>→</span>
+        </button>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>🕹 Manual Teleop</h2>
+
+        <div class="dpad">
+
+            <button onclick="moveRobot(0,-1,-90)">▲</button>
+
+            <div class="dpad-row">
+
+                <button onclick="moveRobot(-1,0,180)">
+                    ◀
+                </button>
+
+                <button class="stop"
+                        onclick="emergencyStop()">
+                    ■
+                </button>
+
+                <button onclick="moveRobot(1,0,0)">
+                    ▶
+                </button>
+
+            </div>
+
+            <button onclick="moveRobot(0,1,90)">
+                ▼
+            </button>
+
+        </div>
+
+        <div style="
+            margin-top:9px;
+            text-align:center;
+            color:#68748f;
+            font-size:8px;
+        ">
+            WASD / ARROW KEYS
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>🧹 Cleaning Queue</h2>
+
+        <div class="queue" id="queue">
+
+            <div style="
+                color:#66728d;
+                text-align:center;
+                padding:10px;
+                font-size:9px;
+            ">
+                No rooms queued
+            </div>
+
+        </div>
+
+        <button
+            onclick="addQueue()"
+            style="
+            width:100%;
+            padding:8px;
+            margin-top:7px;
+            background:#171c30;
+            color:#22d3ee;
+            border:1px solid #293252;
+            border-radius:6px;
+            cursor:pointer;
+            font-size:9px;">
+            + ADD CURRENT GOAL
+        </button>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>🛡️ Safety Systems</h2>
+
+        <div style="font-size:9px;line-height:2;">
+
+            <div>
+                🟢 Collision Avoidance
+                <span style="float:right;color:#34d399">ON</span>
+            </div>
+
+            <div>
+                🟢 Cliff Detection
+                <span style="float:right;color:#34d399">ON</span>
+            </div>
+
+            <div>
+                🟢 Table Interlock
+                <span style="float:right;color:#34d399">ON</span>
+            </div>
+
+            <div>
+                🟢 Dynamic Reroute
+                <span style="float:right;color:#34d399">ON</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</aside>
+
+
+<!-- FOOTER -->
+
+<footer class="footer">
+
+    <div class="footer-stats">
+
+        <div class="footer-stat">
+            ROUTE
+            <b id="routeDistance">0 m</b>
+        </div>
+
+        <div class="footer-stat">
+            NODES
+            <b id="routeNodes">0</b>
+        </div>
+
+        <div class="footer-stat">
+            ETA
+            <b id="routeTime">0 s</b>
+        </div>
+
+        <div class="footer-stat">
+            COVERAGE
+            <b id="coverage">0%</b>
+        </div>
+
+        <div class="footer-stat">
+            MODE
+            <b id="modeText">Smart A*</b>
+        </div>
+
+    </div>
+
+    <div class="actions">
+
+        <button class="start"
+                onclick="startNavigation()"
+                id="startBtn">
+            ▶ START MISSION
+        </button>
+
+        <button class="stop-btn"
+                onclick="emergencyStop()">
+            🚨 EMERGENCY
+        </button>
+
+    </div>
+
+</footer>
+
+</main>
+
+
+<script>
+
+/* =========================================
+   HOUSE MAP
+========================================= */
+
+const ROWS = 35;
+const COLS = 60;
+
+const FREE = 0;
+const WALL = 1;
+const FURNITURE = 2;
+const RUG = 3;
+
+let map = [];
+let selectedTool = "goal";
+
+let start = {x:5,y:5};
+let goal = {x:52,y:27};
+
+let robot = {
+    x:5,
+    y:5,
+    angle:0
+};
+
+let currentPath = [];
+let running = false;
+let timer = null;
+let speed = .6;
+let battery = 82;
+let queue = [];
+
+
+/* =========================================
+   CANVAS
+========================================= */
+
+const canvas = document.getElementById("mapCanvas");
+const ctx = canvas.getContext("2d");
+
+function resizeCanvas(){
+
+    const rect =
+        canvas.parentElement.getBoundingClientRect();
+
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+
+    draw();
+}
+
+window.addEventListener("resize",resizeCanvas);
+
+
+/* =========================================
+   CREATE HOUSE
+========================================= */
+
+function createHouse(){
+
+    const m =
+        Array.from(
+            {length:ROWS},
+            () => Array(COLS).fill(FREE)
+        );
+
+
+    /* OUTER WALL */
+
+    for(let r=0;r<ROWS;r++){
+
+        m[r][0] = WALL;
+        m[r][COLS-1] = WALL;
+
+    }
+
+    for(let c=0;c<COLS;c++){
+
+        m[0][c] = WALL;
+        m[ROWS-1][c] = WALL;
+
+    }
+
+
+    /* VERTICAL WALLS */
+
+    for(let r=1;r<34;r++){
+
+        if(r !== 7 && r !== 8)
+            m[r][19] = WALL;
+
+        if(r !== 17 && r !== 18)
+            m[r][39] = WALL;
+
+    }
+
+
+    /* HORIZONTAL WALLS */
+
+    for(let c=1;c<19;c++){
+
+        if(c < 8 || c > 11)
+            m[13][c] = WALL;
+
+    }
+
+
+    for(let c=40;c<59;c++){
+
+        if(c < 48 || c > 51)
+            m[17][c] = WALL;
+
+    }
+
+
+    /* KITCHEN DIVIDER */
+
+    for(let c=19;c<39;c++){
+
+        if(c < 27 || c > 30)
+            m[10][c] = WALL;
+
+    }
+
+
+    /* BEDROOM DIVIDER */
+
+    for(let c=1;c<19;c++){
+
+        if(c < 8 || c > 11)
+            m[23][c] = WALL;
+
+    }
+
+
+    /* FURNITURE HELPER */
+
+    function furniture(x,y,w,h){
+
+        for(let r=y;r<y+h;r++){
+
+            for(let c=x;c<x+w;c++){
+
+                if(
+                    r>0 &&
+                    r<ROWS-1 &&
+                    c>0 &&
+                    c<COLS-1
+                ){
+
+                    m[r][c] = FURNITURE;
+
+                }
+
+            }
+
+        }
+
+    }
+
+
+    /* LIVING ROOM SOFA */
+
+    furniture(4,4,8,2);
+    furniture(4,5,2,4);
+
+
+    /* COFFEE TABLE */
+
+    furniture(10,8,5,2);
+
+
+    /* KITCHEN ISLAND */
+
+    furniture(24,5,9,3);
+
+
+    /* KITCHEN COUNTER */
+
+    furniture(20,2,3,6);
+
+
+    /* DINING TABLE */
+
+    furniture(44,5,8,3);
+
+
+    /* DINING CHAIRS */
+
+    furniture(46,3,2,2);
+    furniture(50,3,2,2);
+    furniture(46,8,2,2);
+    furniture(50,8,2,2);
+
+
+    /* MASTER BED */
+
+    furniture(5,27,8,4);
+    furniture(3,27,2,2);
+    furniture(13,27,2,2);
+
+
+    /* STUDY DESK */
+
+    furniture(24,25,7,3);
+
+
+    /* STUDY CHAIR */
+
+    furniture(27,29,2,2);
+
+
+    /* UTILITY */
+
+    furniture(44,23,5,3);
+    furniture(52,23,5,3);
+
+
+    /* RUGS */
+
+    function rug(x,y,w,h){
+
+        for(let r=y;r<y+h;r++){
+
+            for(let c=x;c<x+w;c++){
+
+                if(m[r][c] === FREE)
+                    m[r][c] = RUG;
+
+            }
+
+        }
+
+    }
+
+    rug(6,8,7,4);
+    rug(21,7,8,3);
+    rug(43,10,10,4);
+    rug(6,24,8,2);
+    rug(22,29,9,2);
+
+
+    return m;
+}
+
+map = createHouse();
+
+
+/* =========================================
+   ROOM LABELS
+========================================= */
+
+const rooms = [
+
+    {
+        x:4,
+        y:2,
+        w:14,
+        h:10,
+        name:"LIVING ROOM",
+        color:"#38bdf8"
+    },
+
+    {
+        x:20,
+        y:2,
+        w:17,
+        h:8,
+        name:"KITCHEN",
+        color:"#34d399"
+    },
+
+    {
+        x:41,
+        y:2,
+        w:17,
+        h:15,
+        name:"DINING AREA",
+        color:"#fbbf24"
+    },
+
+    {
+        x:2,
+        y:15,
+        w:16,
+        h:18,
+        name:"MASTER BEDROOM",
+        color:"#c084fc"
+    },
+
+    {
+        x:20,
+        y:12,
+        w:18,
+        h:20,
+        name:"SMART STUDY",
+        color:"#60a5fa"
+    },
+
+    {
+        x:41,
+        y:19,
+        w:17,
+        h:13,
+        name:"UTILITY",
+        color:"#fb7185"
+    }
+
+];
+
+
+/* =========================================
+   A*
+========================================= */
+
+function findPath(s,g){
+
+    if(map[s.y][s.x] === WALL ||
+       map[s.y][s.x] === FURNITURE ||
+       map[g.y][g.x] === WALL ||
+       map[g.y][g.x] === FURNITURE){
+
+        return [];
+
+    }
+
+    const key=(x,y)=>x+","+y;
+
+    const open=[{
+        x:s.x,
+        y:s.y,
+        g:0,
+        f:0
+    }];
+
+    const came=new Map();
+    const cost=new Map();
+
+    cost.set(key(s.x,s.y),0);
+
+    const dirs=[
+
+        {x:1,y:0,c:1},
+        {x:-1,y:0,c:1},
+        {x:0,y:1,c:1},
+        {x:0,y:-1,c:1},
+
+        {x:1,y:1,c:1.414},
+        {x:-1,y:1,c:1.414},
+        {x:1,y:-1,c:1.414},
+        {x:-1,y:-1,c:1.414}
+
+    ];
+
+
+    function h(a,b){
+
+        return Math.hypot(
+            a.x-b.x,
+            a.y-b.y
+        );
+
+    }
+
+
+    while(open.length){
+
+        open.sort((a,b)=>a.f-b.f);
+
+        const cur=open.shift();
+
+        if(cur.x===g.x && cur.y===g.y){
+
+            const path=[];
+
+            let k=key(cur.x,cur.y);
+
+            path.push({
+                x:cur.x,
+                y:cur.y
+            });
+
+            while(came.has(k)){
+
+                const p=came.get(k);
+
+                path.push(p);
+
+                k=key(p.x,p.y);
+
+            }
+
+            return path.reverse();
+
+        }
+
+
+        for(const d of dirs){
+
+            const nx=cur.x+d.x;
+            const ny=cur.y+d.y;
+
+            if(
+                nx<0 ||
+                nx>=COLS ||
+                ny<0 ||
+                ny>=ROWS
+            )
+                continue;
+
+
+            if(
+                map[ny][nx]===WALL ||
+                map[ny][nx]===FURNITURE
+            )
+                continue;
+
+
+            /* NO CORNER CUT */
+
+            if(d.x!==0 && d.y!==0){
+
+                if(
+                    map[cur.y][cur.x+d.x]===WALL ||
+                    map[cur.y+d.y][cur.x]===WALL ||
+                    map[cur.y][cur.x+d.x]===FURNITURE ||
+                    map[cur.y+d.y][cur.x]===FURNITURE
+                )
+                    continue;
+
+            }
+
+
+            let terrain =
+                map[ny][nx]===RUG ? 1.15 : 1;
+
+            const ng =
+                cur.g+d.c*terrain;
+
+            const nk=key(nx,ny);
+
+            if(
+                !cost.has(nk) ||
+                ng<cost.get(nk)
+            ){
+
+                cost.set(nk,ng);
+
+                came.set(nk,{
+                    x:cur.x,
+                    y:cur.y
+                });
+
+                open.push({
+                    x:nx,
+                    y:ny,
+                    g:ng,
+                    f:ng+h(
+                        {x:nx,y:ny},
+                        g
+                    )
+                });
+
+            }
+
+        }
+
+    }
+
+    return [];
+}
+
+
+/* =========================================
+   DRAW
+========================================= */
+
+function draw(){
+
+    const cw=canvas.width/COLS;
+    const ch=canvas.height/ROWS;
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    /* BACKGROUND */
+
+    ctx.fillStyle="#080c18";
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    /* ROOM FLOOR TINTS */
+
+    rooms.forEach(room=>{
+
+        ctx.fillStyle =
+            room.color + "0d";
+
+        ctx.fillRect(
+            room.x*cw,
+            room.y*ch,
+            room.w*cw,
+            room.h*ch
+        );
+
+    });
+
+
+    /* GRID */
+
+    for(let r=0;r<ROWS;r++){
+
+        for(let c=0;c<COLS;c++){
+
+            const x=c*cw;
+            const y=r*ch;
+
+
+            if(map[r][c]===WALL){
+
+                ctx.fillStyle="#ef476f";
+
+                ctx.fillRect(
+                    x,
+                    y,
+                    cw,
+                    ch
+                );
+
+                ctx.strokeStyle="#ff8095";
+
+                ctx.strokeRect(
+                    x,
+                    y,
+                    cw,
+                    ch
+                );
+
+            }
+
+            else if(map[r][c]===FURNITURE){
+
+                ctx.fillStyle="#475569";
+
+                ctx.fillRect(
+                    x+1,
+                    y+1,
+                    cw-2,
+                    ch-2
+                );
+
+                ctx.strokeStyle="#94a3b8";
+
+                ctx.strokeRect(
+                    x+1,
+                    y+1,
+                    cw-2,
+                    ch-2
+                );
+
+            }
+
+            else if(map[r][c]===RUG){
+
+                ctx.fillStyle="#312e81";
+
+                ctx.fillRect(
+                    x+1,
+                    y+1,
+                    cw-2,
+                    ch-2
+                );
+
+            }
+
+            else{
+
+                ctx.strokeStyle="rgba(148,163,184,.06)";
+
+                ctx.strokeRect(
+                    x,
+                    y,
+                    cw,
+                    ch
+                );
+
+            }
+
+        }
+
+    }
+
+
+    /* ROOM NAMES */
+
+    rooms.forEach(room=>{
+
+        ctx.fillStyle=room.color;
+
+        ctx.font="bold 10px Arial";
+
+        ctx.globalAlpha=.65;
+
+        ctx.fillText(
+            room.name,
+            room.x*cw+7,
+            room.y*ch+15
+        );
+
+        ctx.globalAlpha=1;
+
+    });
+
+
+    /* ROUTE */
+
+    if(currentPath.length>1){
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            currentPath[0].x*cw+cw/2,
+            currentPath[0].y*ch+ch/2
+        );
+
+        for(let i=1;i<currentPath.length;i++){
+
+            ctx.lineTo(
+                currentPath[i].x*cw+cw/2,
+                currentPath[i].y*ch+ch/2
+            );
+
+        }
+
+        ctx.strokeStyle="#22d3ee";
+        ctx.lineWidth=3;
+        ctx.shadowColor="#22d3ee";
+        ctx.shadowBlur=10;
+
+        ctx.stroke();
+
+        ctx.shadowBlur=0;
+
+    }
+
+
+    /* CHARGER */
+
+    drawCharger(
+        52*cw+cw/2,
+        27*ch+ch/2,
+        cw
+    );
+
+
+    /* GOAL */
+
+    drawMarker(
+        goal.x*cw+cw/2,
+        goal.y*ch+ch/2,
+        "#fb7185",
+        "G"
+    );
+
+
+    /* ROBOT */
+
+    drawRobot(
+        robot.x*cw+cw/2,
+        robot.y*ch+ch/2,
+        cw
+    );
+
+}
+
+
+/* =========================================
+   MARKER
+========================================= */
+
+function drawMarker(x,y,color,label){
+
+    ctx.fillStyle=color;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x,
+        y,
+        8,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+    ctx.strokeStyle="white";
+    ctx.lineWidth=2;
+    ctx.stroke();
+
+    ctx.fillStyle="white";
+    ctx.font="bold 9px Arial";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+
+    ctx.fillText(
+        label,
+        x,
+        y
+    );
+
+}
+
+
+/* =========================================
+   CHARGER
+========================================= */
+
+function drawCharger(x,y,cw){
+
+    ctx.fillStyle="#10b981";
+
+    ctx.fillRect(
+        x-cw*.7,
+        y-cw*.4,
+        cw*1.4,
+        cw*.8
+    );
+
+    ctx.fillStyle="white";
+    ctx.font="bold 9px Arial";
+    ctx.textAlign="center";
+
+    ctx.fillText(
+        "⚡",
+        x,
+        y+3
+    );
+
+}
+
+
+/* =========================================
+   ROBOT
+========================================= */
+
+function drawRobot(x,y,cw){
+
+    ctx.save();
+
+    ctx.translate(x,y);
+
+    ctx.rotate(
+        robot.angle*Math.PI/180
+    );
+
+
+    /* LIDAR */
+
+    ctx.fillStyle="rgba(34,211,238,.12)";
+
+    ctx.beginPath();
+
+    ctx.moveTo(0,0);
+
+    ctx.arc(
+        0,
+        0,
+        cw*4,
+        -.6,
+        .6
+    );
+
+    ctx.closePath();
+
+    ctx.fill();
+
+
+    /* BODY */
+
+    ctx.fillStyle="#fbbf24";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        0,
+        0,
+        cw*.75,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    ctx.strokeStyle="white";
+    ctx.lineWidth=2;
+    ctx.stroke();
+
+
+    /* FRONT */
+
+    ctx.fillStyle="#111827";
+
+    ctx.beginPath();
+
+    ctx.moveTo(cw*.5,0);
+    ctx.lineTo(-cw*.2,-cw*.25);
+    ctx.lineTo(-cw*.05,0);
+    ctx.lineTo(-cw*.2,cw*.25);
+
+    ctx.closePath();
+
+    ctx.fill();
+
+    ctx.restore();
+
+}
+
+
+/* =========================================
+   ROUTE
+========================================= */
+
+function calculateRoute(){
+
+    currentPath=findPath(
+        start,
+        goal
+    );
+
+    const nodes=currentPath.length;
+
+    const distance=
+        Math.max(0,nodes-1)*.5;
+
+    const time=
+        speed>0
+        ? Math.ceil(distance/speed)
+        : 0;
+
+
+    document.getElementById("routeNodes")
+        .textContent=nodes;
+
+    document.getElementById("routeDistance")
+        .textContent=distance.toFixed(1)+" m";
+
+    document.getElementById("routeTime")
+        .textContent=time+" s";
+
+    draw();
+
+}
+
+
+/* =========================================
+   MAP CLICK
+========================================= */
+
+canvas.addEventListener(
+    "click",
+    function(e){
+
+        const rect=canvas.getBoundingClientRect();
+
+        const col=Math.floor(
+            (e.clientX-rect.left)/
+            rect.width*COLS
+        );
+
+        const row=Math.floor(
+            (e.clientY-rect.top)/
+            rect.height*ROWS
+        );
+
+
+        if(
+            col<0 ||
+            row<0 ||
+            col>=COLS ||
+            row>=ROWS
+        )
+            return;
+
+
+        if(selectedTool==="goal"){
+
+            if(
+                map[row][col]===WALL ||
+                map[row][col]===FURNITURE
+            ){
+
+                message("❌ Destination blocked!");
+                return;
+
+            }
+
+            goal={
+                x:col,
+                y:row
+            };
+
+            document.getElementById(
+                "destination"
+            ).textContent=
+                "Custom Destination";
+
+            calculateRoute();
+
+        }
+
+
+        if(selectedTool==="wall"){
+
+            if(
+                col===robot.x &&
+                row===robot.y
+            ){
+
+                message("❌ Robot is here!");
+                return;
+
+            }
+
+            map[row][col]=WALL;
+
+            calculateRoute();
+
+        }
+
+
+        if(selectedTool==="furniture"){
+
+            if(
+                col===robot.x &&
+                row===robot.y
+            ){
+
+                message("❌ Robot is here!");
+                return;
+
+            }
+
+            map[row][col]=FURNITURE;
+
+            calculateRoute();
+
+        }
+
+
+        if(selectedTool==="rug"){
+
+            map[row][col]=RUG;
+
+            calculateRoute();
+
+        }
+
+
+        if(selectedTool==="erase"){
+
+            if(
+                row===0 ||
+                col===0 ||
+                row===ROWS-1 ||
+                col===COLS-1
+            ){
+
+                message("Outer wall protected");
+                return;
+
+            }
+
+            map[row][col]=FREE;
+
+            calculateRoute();
+
+        }
+
+    }
+);
+
+
+/* =========================================
+   TOOL
+========================================= */
+
+function setTool(tool){
+
+    selectedTool=tool;
+
+    document
+        .querySelectorAll(".toolbar button")
+        .forEach(b=>b.classList.remove("active"));
+
+    event.currentTarget.classList.add("active");
+
+}
+
+
+/* =========================================
+   ROOM NAVIGATION
+========================================= */
+
+function goRoom(x,y,name){
+
+    goal={
+        x,
+        y
+    };
+
+    document.getElementById(
+        "destination"
+    ).textContent=name;
+
+    calculateRoute();
+
+    message("🎯 Destination: "+name);
+
+}
+
+
+/* =========================================
+   START NAVIGATION
+========================================= */
+
+function startNavigation(){
+
+    if(running){
+
+        emergencyStop();
+
+        return;
+
+    }
+
+
+    if(currentPath.length<2){
+
+        message("❌ No valid route");
+
+        return;
+
+    }
+
+
+    running=true;
+
+    document.getElementById(
+        "startBtn"
+    ).textContent="⏸ PAUSE MISSION";
+
+
+    let index=0;
+
+
+    timer=setInterval(()=>{
+
+        index++;
+
+
+        if(index>=currentPath.length){
+
+            emergencyStop();
+
+            message("🎯 DESTINATION REACHED");
+
+            document.getElementById(
+                "progress"
+            ).style.width="100%";
+
+            return;
+
+        }
+
+
+        const previous=
+            currentPath[index-1];
+
+        const next=
+            currentPath[index];
+
+
+        let angle=robot.angle;
+
+
+        if(next.x>previous.x)
+            angle=0;
+
+        else if(next.x<previous.x)
+            angle=180;
+
+        else if(next.y>previous.y)
+            angle=90;
+
+        else if(next.y<previous.y)
+            angle=-90;
+
+
+        robot={
+            x:next.x,
+            y:next.y,
+            angle
+        };
+
+
+        start={
+            x:next.x,
+            y:next.y
+        };
+
+
+        battery=
+            Math.max(
+                5,
+                battery-.03
+            );
+
+
+        document.getElementById(
+            "batteryText"
+        ).textContent=
+            Math.round(battery)+"%";
+
+        document.getElementById(
+            "batteryFill"
+        ).style.width=
+            battery+"%";
+
+
+        document.getElementById(
+            "progress"
+        ).style.width=
+            (index/(currentPath.length-1)*100)+"%";
+
+
+        updateTelemetry();
+
+        draw();
+
+    },180);
+
+}
+
+
+/* =========================================
+   STOP
+========================================= */
+
+function emergencyStop(){
+
+    if(timer){
+
+        clearInterval(timer);
+        timer=null;
+
+    }
+
+    running=false;
+
+    document.getElementById(
+        "startBtn"
+    ).textContent="▶ START MISSION";
+
+    document.getElementById(
+        "velocity"
+    ).textContent="0.00 m/s";
+
+}
+
+
+/* =========================================
+   MANUAL CONTROL
+========================================= */
+
+function moveRobot(dx,dy,angle){
+
+    emergencyStop();
+
+    const nx=robot.x+dx;
+    const ny=robot.y+dy;
+
+
+    if(
+        nx<0 ||
+        ny<0 ||
+        nx>=COLS ||
+        ny>=ROWS
+    ){
+
+        message("⛔ Boundary detected");
+        return;
+
+    }
+
+
+    if(
+        map[ny][nx]===WALL ||
+        map[ny][nx]===FURNITURE
+    ){
+
+        message("🛑 OBSTACLE DETECTED");
+        return;
+
+    }
+
+
+    robot={
+        x:nx,
+        y:ny,
+        angle
+    };
+
+    start={
+        x:nx,
+        y:ny
+    };
+
+
+    document.getElementById(
+        "velocity"
+    ).textContent=
+        speed.toFixed(2)+" m/s";
+
+
+    updateTelemetry();
+
+    calculateRoute();
+
+}
+
+
+/* =========================================
+   TELEMETRY
+========================================= */
+
+function updateTelemetry(){
+
+    document.getElementById(
+        "posX"
+    ).textContent=
+        (robot.x*.5).toFixed(1)+" m";
+
+    document.getElementById(
+        "posY"
+    ).textContent=
+        (robot.y*.5).toFixed(1)+" m";
+
+    document.getElementById(
+        "heading"
+    ).textContent=
+        robot.angle+"°";
+
+}
+
+
+/* =========================================
+   SPEED
+========================================= */
+
+function changeSpeed(value){
+
+    speed=Number(value);
+
+    document.getElementById(
+        "speedText"
+    ).textContent=
+        speed.toFixed(1)+" m/s";
+
+    calculateRoute();
+
+}
+
+
+/* =========================================
+   PROFILE
+========================================= */
+
+function setProfile(profile){
+
+    if(profile==="Eco")
+        speed=.4;
+
+    if(profile==="Normal")
+        speed=.7;
+
+    if(profile==="Turbo")
+        speed=1.2;
+
+
+    document.getElementById(
+        "speedText"
+    ).textContent=
+        speed.toFixed(1)+" m/s";
+
+    calculateRoute();
+
+    message("⚙️ "+profile+" profile selected");
+
+}
+
+
+/* =========================================
+   MODE
+========================================= */
+
+function setMode(button,mode){
+
+    document
+        .querySelectorAll(".mode button")
+        .forEach(b=>b.classList.remove("active"));
+
+    button.classList.add("active");
+
+    document.getElementById(
+        "modeText"
+    ).textContent=mode;
+
+    message("🧠 Mode: "+mode);
+
+}
+
+
+/* =========================================
+   QUEUE
+========================================= */
+
+function addQueue(){
+
+    const name=
+        document.getElementById(
+            "destination"
+        ).textContent;
+
+    queue.push(name);
+
+    renderQueue();
+
+    message("➕ Added to cleaning queue");
+
+}
+
+
+function renderQueue(){
+
+    const box=
+        document.getElementById("queue");
+
+    if(queue.length===0){
+
+        box.innerHTML=
+            `<div style="
+            color:#66728d;
+            text-align:center;
+            padding:10px;
+            font-size:9px;">
+            No rooms queued
+            </div>`;
+
+        return;
+
+    }
+
+
+    box.innerHTML="";
+
+    queue.forEach((item,index)=>{
+
+        const div=
+            document.createElement("div");
+
+        div.className="queue-item";
+
+        div.innerHTML=
+            `<span>${index+1}. ${item}</span>
+             <button onclick="removeQueue(${index})">✕</button>`;
+
+        box.appendChild(div);
+
+    });
+
+}
+
+
+function removeQueue(index){
+
+    queue.splice(index,1);
+
+    renderQueue();
+
+}
+
+
+/* =========================================
+   RESET
+========================================= */
+
+function resetMap(){
+
+    emergencyStop();
+
+    map=createHouse();
+
+    start={
+        x:5,
+        y:5
+    };
+
+    goal={
+        x:52,
+        y:27
+    };
+
+    robot={
+        x:5,
+        y:5,
+        angle:0
+    };
+
+    battery=82;
+
+    document.getElementById(
+        "batteryText"
+    ).textContent="82%";
+
+    document.getElementById(
+        "batteryFill"
+    ).style.width="82%";
+
+    document.getElementById(
+        "destination"
+    ).textContent="Charging Dock";
+
+    calculateRoute();
+
+    updateTelemetry();
+
+    message("🏡 SMART HOUSE RESET");
+
+}
+
+
+/* =========================================
+   MESSAGE
+========================================= */
+
+function message(text){
+
+    const alert=
+        document.createElement("div");
+
+    alert.className="alert";
+
+    alert.textContent=text;
+
+    document.body.appendChild(alert);
+
+    setTimeout(()=>{
+        alert.remove();
+    },1800);
+
+}
+
+
+/* =========================================
+   KEYBOARD
+========================================= */
+
+document.addEventListener(
+    "keydown",
+    function(e){
+
+        if(
+            e.key==="ArrowUp" ||
+            e.key.toLowerCase()==="w"
+        ){
+
+            e.preventDefault();
+
+            moveRobot(
+                0,-1,-90
+            );
+
+        }
+
+
+        if(
+            e.key==="ArrowDown" ||
+            e.key.toLowerCase()==="s"
+        ){
+
+            e.preventDefault();
+
+            moveRobot(
+                0,1,90
+            );
+
+        }
+
+
+        if(
+            e.key==="ArrowLeft" ||
+            e.key.toLowerCase()==="a"
+        ){
+
+            e.preventDefault();
+
+            moveRobot(
+                -1,0,180
+            );
+
+        }
+
+
+        if(
+            e.key==="ArrowRight" ||
+            e.key.toLowerCase()==="d"
+        ){
+
+            e.preventDefault();
+
+            moveRobot(
+                1,0,0
+            );
+
+        }
+
+
+        if(e.code==="Space"){
+
+            e.preventDefault();
+
+            emergencyStop();
+
+            message("🚨 EMERGENCY STOP");
+
+        }
+
+    }
+);
+
+
+/* =========================================
+   INITIALIZE
+========================================= */
+
+setTimeout(()=>{
+
+    resizeCanvas();
+
+    calculateRoute();
+
+    updateTelemetry();
+
+},100);
+
+</script>
+
+</body>
+</html>
+```
